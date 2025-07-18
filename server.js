@@ -15,20 +15,26 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 // --- Middlewares ---
+
+// CORS Configuration
 const allowedOrigins = [
-  'https://artibo.maivo.com.tr',
-  'http://localhost:3000' // For local development
+  'http://localhost:3000',
+  'https://artibo.maivo.com.tr'
 ];
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
     }
+    return callback(null, true);
   }
-}));
+};
+app.use(cors(corsOptions));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
