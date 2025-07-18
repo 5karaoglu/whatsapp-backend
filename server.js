@@ -15,7 +15,20 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 // --- Middlewares ---
-app.use(cors());
+const allowedOrigins = [
+  'https://artibo.maivo.com.tr',
+  'http://localhost:3000' // For local development
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
