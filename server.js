@@ -16,27 +16,8 @@ const port = process.env.PORT || 5001;
 
 // --- Middlewares ---
 
-// CORS Configuration
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://artibo.maivo.com.tr'
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+// Basic CORS setup. The detailed configuration will be handled by vercel.json.
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
