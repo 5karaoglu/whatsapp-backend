@@ -21,18 +21,20 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+        const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
 
         if (!email) {
+          // Log the profile to see what we received from Facebook
+          console.error('Facebook profile did not return an email. Profile:', JSON.stringify(profile, null, 2));
           return done(new Error('Facebook profile did not return an email.'), null);
         }
 
         const [user, created] = await User.findOrCreate({
-          where: { facebookId: profile.id },
+          where: { email: email },
           defaults: {
-            name: profile.displayName,
-            email: email,
             facebookId: profile.id,
+            displayName: profile.displayName,
+            email: email,
           },
         });
 
