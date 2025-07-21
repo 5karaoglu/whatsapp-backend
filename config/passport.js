@@ -21,30 +21,41 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
-
-        if (!email) {
-          // Log the profile to see what we received from Facebook
-          console.error('Facebook profile did not return an email. Profile:', JSON.stringify(profile, null, 2));
-          return done(new Error('Facebook profile did not return an email.'), null);
-        }
+        const facebookId = profile.id;
+        const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+        const displayName = profile.displayName;
 
         const [user, created] = await User.findOrCreate({
-          where: { email: email },
+          where: { facebookId: facebookId },
           defaults: {
-            facebookId: profile.id,
-            displayName: profile.displayName,
-            email: email,
+            facebookId: facebookId,
+            displayName: displayName,
+            email: email, // Can be null if not provided
           },
         });
 
-        if (created) {
-          // If a new user is created, also create an empty credentials entry for them
+        if (!created) {
+          // If user already exists, check if we need to update their info
+          let needsUpdate = false;
+          if (email && user.email !== email) {
+            user.email = email;
+            needsUpdate = true;
+          }
+          if (displayName && user.displayName !== displayName) {
+            user.displayName = displayName;
+            needsUpdate = true;
+          }
+          if (needsUpdate) {
+            await user.save();
+          }
+        } else {
+          // If a new user is created, also create an empty credentials entry
           await UserCredentials.create({ userId: user.id });
         }
         
         return done(null, user); // Pass user object to the next middleware
       } catch (error) {
+        console.error("Error in FacebookTokenStrategy:", error);
         return done(error, null);
       }
     }
