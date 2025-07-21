@@ -21,7 +21,13 @@ const corsOptions = {
   origin: 'https://artibo.maivo.com.tr',
   optionsSuccessStatus: 200 // For legacy browser support
 };
+
+// Use CORS with options
 app.use(cors(corsOptions));
+
+// Explicitly handle preflight requests for all routes
+app.options('*', cors(corsOptions));
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
