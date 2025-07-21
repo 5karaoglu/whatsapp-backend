@@ -22,27 +22,36 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       try {
         const facebookId = profile.id;
-        const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
-        const displayName = profile.displayName;
+        // Use the correct field name from the User model: 'name'
+        const name = profile.displayName; 
+        
+        // Handle cases where email is null, undefined, or an empty string
+        let email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+        if (!email) {
+          // If no email, create a placeholder email to satisfy db constraints (unique, not null, isEmail)
+          email = `${facebookId}@facebook.placeholder.com`;
+        }
 
         const [user, created] = await User.findOrCreate({
           where: { facebookId: facebookId },
           defaults: {
             facebookId: facebookId,
-            displayName: displayName,
-            email: email, // Can be null if not provided
+            name: name, // Use 'name' instead of 'displayName'
+            email: email, 
           },
         });
 
         if (!created) {
           // If user already exists, check if we need to update their info
           let needsUpdate = false;
-          if (email && user.email !== email) {
-            user.email = email;
+          // Only update email if a new, valid email is provided
+          const newValidEmail = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+          if (newValidEmail && user.email !== newValidEmail) {
+            user.email = newValidEmail;
             needsUpdate = true;
           }
-          if (displayName && user.displayName !== displayName) {
-            user.displayName = displayName;
+          if (name && user.name !== name) {
+            user.name = name;
             needsUpdate = true;
           }
           if (needsUpdate) {
