@@ -84,6 +84,10 @@ passport.use(
         
         return done(null, user);
       } catch (error) {
+        if (error.response) {
+          // Log the full detailed error response from Facebook's server
+          console.error("Full error response from Facebook:", JSON.stringify(error.response.data, null, 2));
+        }
         console.error("Error in FacebookTokenStrategy:", error.response ? error.response.data.error : error.message);
         return done(error, null);
       }
