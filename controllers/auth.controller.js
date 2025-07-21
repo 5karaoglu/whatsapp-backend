@@ -23,7 +23,7 @@ exports.facebookLogin = (req, res) => {
   res.json({
     success: true,
     message: 'User authenticated successfully.',
-    token: `Bearer ${token}`,
+    token: token, // Return the raw token, not "Bearer <token>"
     user: {
         id: req.user.id,
         name: req.user.name,
