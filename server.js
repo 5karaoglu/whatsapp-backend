@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors');
+// const cors = require('cors'); // No longer needed, handled by Nginx
 require('dotenv').config();
 
 const passport = require('./config/passport');
@@ -15,12 +15,8 @@ const port = process.env.PORT || 5001;
 
 // --- Middlewares ---
 
-// CORS Configuration
-const corsOptions = {
-  origin: 'https://artibo.maivo.com.tr',
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+// CORS is now handled by the Nginx reverse proxy.
+// No CORS configuration is needed in the application code.
 
 // Replace deprecated body-parser with modern Express equivalents
 app.use(express.json());
