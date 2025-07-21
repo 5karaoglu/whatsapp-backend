@@ -16,8 +16,12 @@ const port = process.env.PORT || 5001;
 
 // --- Middlewares ---
 
-// Basic CORS setup. The detailed configuration will be handled by vercel.json.
-app.use(cors());
+// Explicitly configure CORS to allow requests from your frontend's origin
+const corsOptions = {
+  origin: 'https://artibo.maivo.com.tr',
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
