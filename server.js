@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -16,21 +15,17 @@ const port = process.env.PORT || 5001;
 
 // --- Middlewares ---
 
-// Explicitly configure CORS to allow requests from your frontend's origin
+// CORS Configuration
 const corsOptions = {
   origin: 'https://artibo.maivo.com.tr',
-  optionsSuccessStatus: 200 // For legacy browser support
+  optionsSuccessStatus: 200
 };
-
-// Use CORS with options
 app.use(cors(corsOptions));
 
-// Explicitly handle preflight requests for all routes
-app.options('*', cors(corsOptions));
+// Replace deprecated body-parser with modern Express equivalents
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
 // --- API Routes ---
