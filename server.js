@@ -20,14 +20,16 @@ if (process.env.DEBUG_MODE === 'true') {
 }
 
 // Middleware
+// ALLOWED_ORIGINS ortam değişkeninin tanımlı olup olmadığını kontrol et,
+// değilse crash olmasını engellemek için boş bir dizi kullan.
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
 const corsOptions = {
-  origin: process.env.ALLOWED_ORIGINS.split(','), // Nginx'den gelen istekleri izin ver
+  origin: allowedOrigins,
   credentials: true,
 };
 app.use(cors(corsOptions));
 
-// Replace deprecated body-parser with modern Express equivalents
-app.use(express.json());
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(passport.initialize());
