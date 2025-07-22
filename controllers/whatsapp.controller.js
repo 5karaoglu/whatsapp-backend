@@ -22,24 +22,22 @@ const handleServiceCall = async (req, res, serviceFn, ...args) => {
 };
 
 exports.sendMessage = async (req, res) => {
-  const { recipientNumber, messageType, messageText, template } = req.body;
-  let payload = { messaging_product: 'whatsapp', to: recipientNumber };
+  // Frontend, WhatsApp API'sine çok benzer bir payload gönderiyor.
+  // Bu payload'ı doğrudan alıp zenginleştirmek daha verimli.
+  const payloadFromFrontend = req.body;
 
-  if (messageType === 'text') {
-    payload.type = 'text';
-    payload.text = { body: messageText };
-  } else if (messageType === 'template') {
-    payload.type = 'template';
-    payload.template = {
-      name: template.name,
-      language: { code: template.language },
-      components: template.components || [],
-    };
-  } else {
-    return res.status(400).json({ success: false, message: 'Invalid message type.' });
+  // Temel doğrulama
+  if (!payloadFromFrontend.to || !payloadFromFrontend.type) {
+    return res.status(400).json({ success: false, message: 'Payload "to" ve "type" alanlarını içermelidir.' });
   }
 
-  await handleServiceCall(req, res, whatsappService.sendMessage, payload);
+  // Son payload'u oluştur
+  const finalPayload = {
+    messaging_product: 'whatsapp',
+    ...payloadFromFrontend,
+  };
+
+  await handleServiceCall(req, res, whatsappService.sendMessage, finalPayload);
 };
 
 exports.createTemplate = async (req, res) => {
