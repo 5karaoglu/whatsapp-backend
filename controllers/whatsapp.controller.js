@@ -3,7 +3,15 @@ const whatsappService = require('../services/whatsapp.service');
 
 const handleServiceCall = async (req, res, serviceFn, ...args) => {
   try {
+    console.log('[handleServiceCall] Authenticated user:', JSON.stringify(req.user, null, 2));
     const credentials = await UserCredentials.findOne({ where: { userId: req.user.id } });
+    console.log('[handleServiceCall] Found credentials:', JSON.stringify(credentials, null, 2));
+
+    if (!credentials) {
+      // Explicitly throw the error that we are seeing in the logs.
+      throw new Error('User credentials not found.');
+    }
+
     const result = await serviceFn(credentials, ...args);
     res.json({ success: true, data: result });
   } catch (error) {

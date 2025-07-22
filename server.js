@@ -1,22 +1,30 @@
 const express = require('express');
-// const cors = require('cors'); // No longer needed, handled by Nginx
-require('dotenv').config();
-
-const passport = require('./config/passport');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const passport = require('passport');
+const morgan = require('morgan'); // Morgan'ı import et
 const sequelize = require('./config/database');
-
-// Routes
 const authRoutes = require('./routes/auth.routes');
 const credentialsRoutes = require('./routes/credentials.routes');
 const whatsappRoutes = require('./routes/whatsapp.routes');
+require('dotenv').config();
+require('./config/passport');
 
 const app = express();
 const port = process.env.PORT || 5001;
 
-// --- Middlewares ---
+// --- Debug Mode ---
+// Ortam değişkeni DEBUG_MODE=true ise, detaylı istek loglarını etkinleştir.
+if (process.env.DEBUG_MODE === 'true') {
+  app.use(morgan('dev'));
+}
 
-// CORS is now handled by the Nginx reverse proxy.
-// No CORS configuration is needed in the application code.
+// Middleware
+const corsOptions = {
+  origin: process.env.ALLOWED_ORIGINS.split(','), // Nginx'den gelen istekleri izin ver
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 // Replace deprecated body-parser with modern Express equivalents
 app.use(express.json());
