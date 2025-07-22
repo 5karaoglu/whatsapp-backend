@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
+// const cors = require('cors'); // Nginx CORS'u yönettiği için artık gerekli değil.
 const passport = require('passport');
 const morgan = require('morgan'); // Morgan'ı import et
 const sequelize = require('./config/database');
@@ -20,14 +20,13 @@ if (process.env.DEBUG_MODE === 'true') {
 }
 
 // Middleware
-// ALLOWED_ORIGINS ortam değişkeninin tanımlı olup olmadığını kontrol et,
-// değilse crash olmasını engellemek için boş bir dizi kullan.
-const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
-const corsOptions = {
-  origin: allowedOrigins,
-  credentials: true,
-};
-app.use(cors(corsOptions));
+// CORS ayarları kaldırıldı. Bu sorumluluk tamamen Nginx'e devredildi.
+// const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
+// const corsOptions = {
+//   origin: allowedOrigins,
+//   credentials: true,
+// };
+// app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
