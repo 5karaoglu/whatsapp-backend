@@ -79,5 +79,7 @@ exports.getTemplates = async (userCredentials, status) => {
       }
     });
     
-    return response.data;
+    // Return only the data array from the response, or an empty array if it doesn't exist.
+    // This ensures the frontend always receives an array and prevents ".map is not a function" errors.
+    return response.data.data || [];
 }; 
