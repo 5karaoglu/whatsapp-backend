@@ -1,10 +1,25 @@
-const { Sequelize } = require('sequelize');
+require('dotenv').config();
 const path = require('path');
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(__dirname, '..', 'whatsapp_management.sqlite'),
-  logging: false, // Set to console.log to see SQL queries
-});
+// sequelize-cli'nin anlayacağı formatta bir yapılandırma objesi.
+// Bu obje, development, test ve production ortamları için ayrı ayrı 
+// veritabanı ayarları içerebilir.
+const config = {
+  development: {
+    dialect: 'sqlite',
+    storage: path.join(__dirname, '..', 'whatsapp_management.sqlite'),
+    logging: false, // SQL sorgularını görmek için console.log yapabilirsiniz.
+  },
+  test: {
+    dialect: 'sqlite',
+    storage: ':memory:',
+    logging: false,
+  },
+  production: {
+    dialect: 'sqlite',
+    storage: process.env.DATABASE_STORAGE_PATH || path.join(__dirname, '..', 'whatsapp_management.sqlite'),
+    logging: false,
+  }
+};
 
-module.exports = sequelize; 
+module.exports = config; 

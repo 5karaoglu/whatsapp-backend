@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 // const cors = require('cors'); // Nginx CORS'u yönettiği için artık gerekli değil.
 const passport = require('passport');
 const morgan = require('morgan'); // Morgan'ı import et
-const sequelize = require('./config/database');
+const sequelize = require('./config/sequelize'); // Güncellendi
 const authRoutes = require('./routes/auth.routes');
 const credentialsRoutes = require('./routes/credentials.routes');
 const whatsappRoutes = require('./routes/whatsapp.routes');
@@ -45,14 +45,19 @@ app.get('/', (req, res) => {
 // --- Database Sync and Server Start ---
 const startServer = async () => {
   try {
-    await sequelize.sync({ alter: true }); // { alter: true } helps to update table schema without losing data
-    console.log('Database synced successfully.');
+    // await sequelize.sync({ alter: true }); // { alter: true } helps to update table schema without losing data
+    // VERİTABANI SENKRONİZASYONU ARTIK MIGRATION'LAR İLE YÖNETİLECEK.
+    // Projeyi ilk kez kuruyorsanız veya yeni bir migration çalıştıracaksanız,
+    // terminalden "npx sequelize-cli db:migrate" komutunu çalıştırın.
+    
+    await sequelize.authenticate();
+    console.log('Database connection has been established successfully.');
     
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
   } catch (error) {
-    console.error('Unable to sync database:', error);
+    console.error('Unable to connect to the database:', error);
     process.exit(1);
   }
 };
