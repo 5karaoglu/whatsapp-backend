@@ -41,11 +41,14 @@ exports.sendMessage = async (req, res) => {
 };
 
 exports.createTemplate = async (req, res) => {
-  const { name, language, category, headerText, bodyText, footerText } = req.body;
-  const components = [];
-  if (headerText) components.push({ type: 'HEADER', format: 'TEXT', text: headerText });
-  if (bodyText) components.push({ type: 'BODY', text: bodyText });
-  if (footerText) components.push({ type: 'FOOTER', text: footerText });
+  // Frontend'den gelen payload'u doğrudan kullan.
+  // Frontend, 'components' dizisini WhatsApp API formatına uygun şekilde hazırlıyor.
+  const { name, language, category, components } = req.body;
+
+  // Temel doğrulama
+  if (!name || !language || !category || !components || !Array.isArray(components) || components.length === 0) {
+    return res.status(400).json({ success: false, message: 'name, language, category, and a non-empty components array are required.' });
+  }
 
   const templateData = { name, language, category, components };
   await handleServiceCall(req, res, whatsappService.createTemplate, templateData);
