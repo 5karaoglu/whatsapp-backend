@@ -7,7 +7,15 @@ exports.getCredentials = async (req, res) => {
     if (!credentials) {
       return res.status(404).json({ success: false, message: 'Credentials not found for this user.' });
     }
-    res.json({ success: true, data: credentials });
+    // Map database fields to the fields expected by the frontend
+    res.json({
+      success: true,
+      data: {
+        phoneNumberId: credentials.phone_number_id,
+        accessToken: credentials.whatsapp_token,
+        whatsappBusinessAccountId: credentials.whatsapp_business_account_id,
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to retrieve credentials.', error: error.message });
   }
@@ -16,15 +24,22 @@ exports.getCredentials = async (req, res) => {
 // Update the credentials for the logged-in user
 exports.updateCredentials = async (req, res) => {
   try {
-    const { whatsapp_token, phone_number_id, whatsapp_business_account_id } = req.body;
+    const { phoneNumberId, accessToken, whatsappBusinessAccountId } = req.body;
     
     const [credentials, created] = await UserCredentials.findOrCreate({
       where: { userId: req.user.id }
     });
     
-    credentials.whatsapp_token = whatsapp_token || null;
-    credentials.phone_number_id = phone_number_id || null;
-    credentials.whatsapp_business_account_id = whatsapp_business_account_id || null;
+    // Update fields only if they are provided in the request body
+    if (accessToken) {
+      credentials.whatsapp_token = accessToken;
+    }
+    if (phoneNumberId) {
+      credentials.phone_number_id = phoneNumberId;
+    }
+    if (whatsappBusinessAccountId) {
+      credentials.whatsapp_business_account_id = whatsappBusinessAccountId;
+    }
     
     await credentials.save();
 
