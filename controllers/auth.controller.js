@@ -1,3 +1,4 @@
+const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const UserCredentials = require('../models/credentials.model');
 require('dotenv').config();
