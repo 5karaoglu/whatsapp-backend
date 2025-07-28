@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
+    "db:migrate:make": "./node_modules/.bin/sequelize-cli migration:generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
