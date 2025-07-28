@@ -38,9 +38,21 @@ passport.use(
         // Step 2: Find or create the user in our database
         const [user, created] = await User.findOrCreate({
           where: { facebookId: facebookId },
-          defaults: { facebookId, name, email },
+          defaults: {
+            facebookId,
+            name,
+            email,
+            displayName: profile.displayName,
+            profilePictureUrl: profile.photos[0]?.value || null,
+          },
         });
-        
+
+        if (!created) {
+           user.displayName = profile.displayName;
+           user.profilePictureUrl = profile.photos[0]?.value || null;
+           await user.save();
+        }
+
         // Step 3: Exchange the short-lived token for a long-lived one using the correct Graph API flow
         const longLivedTokenUrl = `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&fb_exchange_token=${shortLivedToken}`;
         const tokenResponse = await axios.get(longLivedTokenUrl);
@@ -81,7 +93,7 @@ passport.use(
           credentials.phone_number_id = phoneNumberId;
           await credentials.save();
         }
-        
+
         return done(null, user);
       } catch (error) {
         if (error.response) {
